@@ -1,0 +1,55 @@
+curl -o media3-migration.sh \
+  "https://raw.githubusercontent.com/google/ExoPlayer/r2.19.1/media3-migration.sh"
+chmod 744 media3-migration../media3-migration.sh -l -f /path/to/gradle/project/root
+./media3-migration.sh -m /path/to/gradle/project/root
+./media3-migration.sh -m -f /path/to/gradle/project/root
+ # list files selected for migration when excluding paths
+ ./media3-migration.sh -l -x "app/src/test/" -x "service/" /path/to/project/root
+ # migrate the selected files
+ ./media3-migration.sh -m -x "app/src/test/" -x "service/" /path/to/project/root
+implementation "androidx.media3:media3-session:
+val player = ExoPlayer.Builder(context).build()
+mediaSession = MediaSession.Builder(context, player)
+    .setSessionCallback(MySessionCallback())
+    .build()
+mediaSession?.run {
+  player.release()
+  release()
+  mediaSession = null
+}
+<service android:name=".MusicService" android:exported="true">
+    <intent-filter>
+        <action android:name="androidx.media3.session.MediaLibraryService"/>
+        <action android:name="android.media.browse.MediaBrowserService" />
+    </intent-filter>
+</service>
+implementation "androidx.media3:media3-session:1.1.1"
+mediaLibrarySession =
+      MediaLibrarySession.Builder(this, player, MySessionCallback())
+         .build()
+scope.launch {
+    val sessionToken =
+        SessionToken(context, ComponentName(context, MusicService::class.java)
+    browser =
+        MediaBrowser.Builder(context, sessionToken))
+            .setListener(BrowserListener())
+            .buildAsync()
+            .await()
+    // Get the library root to start browsing the library.
+    root = browser.getLibraryRoot(/* params= */ null).await();
+    // Add a MediaController.Listener to listen to player state events.
+    browser.addListener(playerListener)
+    playerView.setPlayer(browser)
+}
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+
+@OptIn(UnstableApi::class)
+fun functionUsingUnstableApi() {
+  // Do something useful.
+}
+@OptIn(markerClass = UnstableApi.class)
+package name.of.your.package;
+
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
