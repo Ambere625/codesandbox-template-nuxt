@@ -1,0 +1,134 @@
+abstract void addMediaItem(int index, MediaItem mediaItem)
+dependencies {
+    def media3_version = "1.1.1"
+
+    // For media playback using ExoPlayer
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+
+    // For DASH playback support with ExoPlayer
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+    // For HLS playback support with ExoPlayer
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    // For RTSP playback support with ExoPlayer
+    implementation "androidx.media3:media3-exoplayer-rtsp:$media3_version"
+    // For ad insertion using the Interactive Media Ads SDK with ExoPlayer
+    implementation "androidx.media3:media3-exoplayer-ima:$media3_version"
+
+    // For loading data using the Cronet network stack
+    implementation "androidx.media3:media3-datasource-cronet:$media3_version"
+    // For loading data using the OkHttp network stack
+    implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
+    // For loading data using librtmp
+    implementation "androidx.media3:media3-datasource-rtmp:$media3_version"
+
+    // For building media playback UIs
+    implementation "androidx.media3:media3-ui:$media3_version"
+    // For building media playback UIs for Android TV using the Jetpack Leanback library
+    implementation "androidx.media3:media3-ui-leanback:$media3_version"
+
+    // For exposing and controlling media sessions
+    implementation "androidx.media3:media3-session:$media3_version"
+
+    // For extracting data from media containers
+    implementation "androidx.media3:media3-extractor:$media3_version"
+
+    // For integrating with Cast
+    implementation "androidx.media3:media3-cast:$media3_version"
+
+    // For scheduling background operations using Jetpack Work's WorkManager with ExoPlayer
+    implementation "androidx.media3:media3-exoplayer-workmanager:$media3_version"
+
+    // For transforming media files
+    implementation "androidx.media3:media3-transformer:$media3_version"
+
+    // Utilities for testing media components (including ExoPlayer components)
+    implementation "androidx.media3:media3-test-utils:$media3_version"
+    // Utilities for testing media components (including ExoPlayer components) via Robolectric
+    implementation "androidx.media3:media3-test-utils-robolectric:$media3_version"
+
+    // Common functionality for media database components
+    implementation "androidx.media3:media3-database:$media3_version"
+    // Common functionality for media decoders
+    implementation "androidx.media3:media3-decoder:$media3_version"
+    // Common functionality for loading data
+    implementation "androidx.media3:media3-datasource:$media3_version"
+    // Common functionality used across multiple media libraries
+    implementation "androidx.media3:media3-common:$media3_version"
+}
+private void initializePlayer() {
+    [...]
+    val mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4)) // Existing code
+
+    val secondMediaItem = MediaItem.fromUri(getString(R.string.media_url_mp3))
+    // Update setMediaItems to include secondMediaItem
+    exoPlayer.setMediaItems(listOf(mediaItem, secondMediaItem), mediaItemIndex, playbackPosition)
+    [...]
+}
+exoplayer-intro/exoplayer-codelab-02.
+private fun initializePlayer() {
+    player = ExoPlayer.Builder(this)
+        .build()
+        .also { exoPlayer ->
+            // Update the track selection parameters to only pick standard definition tracks
+            exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters
+                    .buildUpon()
+                    .setMaxVideoSizeSd()
+                    .build()
+            [...]
+        }
+}
+private void initializePlayer() {
+    [...]
+
+    // Replace this line...
+    val mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4));
+
+    // ... with this
+     val mediaItem = MediaItem.Builder()
+         .setUri(getString(R.string.media_url_dash))
+         .setMimeType(MimeTypes.APPLICATION_MPD)
+         .build()
+
+    // Remove the following line
+    val secondMediaItem = MediaItem.fromUri(getString(R.string.media_url_mp3))
+
+    // Remove secondMediaItem from setMediaItems
+    exoPlayer.setMediaItems(listOf(mediaItem), mediaItemIndex, playbackPosition)
+}
+private const val TAG = "PlayerActivity"
+private fun playbackStateListener() = object : Player.Listener {
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        val stateString: String = when (playbackState) {
+            ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
+            ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
+            ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
+            ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
+            else -> "UNKNOWN_STATE             -"
+        }
+        Log.d(TAG, "changed state to $stateString")
+    }
+}
+class PlayerActivity : AppCompatActivity() {
+    [...]
+
+    private val playbackStateListener: Player.Listener = playbackStateListener()
+}
+private void initializePlayer() {
+    [...]
+    exoPlayer.playWhenReady = playWhenReady
+    exoPlayer.addListener(playbackStateListener) // Add this line
+    exoPlayer.prepare()
+    [...]
+}
+private void releasePlayer() {
+    player?.let { exoPlayer ->
+        [...]
+        exoPlayer.removeListener(playbackStateListener)
+        exoPlayer.release()
+    }
+    player = null
+}
+exoplayer-intro/exoplayer-codelab-04.
+
+
+
